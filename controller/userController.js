@@ -48,26 +48,8 @@ router.get('/upload', (req, res) => {
 })
 
 router.post('/upload', upload.single('img'), async (req, res) => {
-    var img = req.file.filename
-    var usuario = req.session.resultado
-    console.log(usuario)
-    if(usuario != undefined){
-        try{
-            var client = await Users.findByPk(usuario.id)
-            console.log(client)
-            var x = await fs.unlinkSync(`public/uploads/${client.foto}`)
-            console.log(x)
-            if(client != undefined){
-                Users.update({foto: img}, {where:{nome: usuario.nome}}).then(function(rowsUpdated){
-                    res.redirect('/upload')
-                }).catch(err =>{
-                    console.log(err)
-                })
-            }
-        }catch(e){
-            res.json({error: e})
-        }
-    }
+    var foto = req.body.img
+    console.log(foto)
 })
 
 
