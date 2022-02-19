@@ -48,8 +48,43 @@ router.get('/upload', (req, res) => {
 })
 
 router.post('/upload', upload.single('img'), async (req, res) => {
-    var foto = req.body.img
-    console.log(foto)
+    var usuario = req.session.resultado
+    var img = req.file
+
+    if(img != undefined){
+        img = img.path.replace("public", "")
+        console.log(img)
+    }
+
+    if(usuario != undefined){
+        try{
+            var client = await Users.findByPk(usuario.id)
+            console.log(client)
+            if(client != undefined){
+                var teste = client.foto
+                console.log(teste)
+                if(teste === 'assets/noprofile.jpg'){
+                    Users.update({foto: img}, {where:{nome: usuario.nome}}).then(function(rowsUpdated){
+                        res.redirect('/upload')
+                    }).catch(e => {
+                        console.log(e)
+                    })
+                }else{
+                    var x = await fs.unlinkSync(`public/${client.foto}`)
+                    console.log(x);
+                    Users.update({foto: img}, {where:{nome: usuario.nome}}).then(function(rowsUpdated){
+                        res.redirect('/upload')
+                    }).catch(e => {
+                        console.log(e)
+                    })
+                }
+                
+            }
+        }catch(e){
+            res.json({error: e})
+        }
+    }
+
 })
 
 
@@ -61,6 +96,7 @@ router.post('/cadastro', upload.single('foto'), async (req, res)=>{
 
     if(foto != undefined){
         foto = foto.path.replace('public', '')
+        console.log(foto)
     }else{
         foto = 'assets/noprofile.jpg'
     }
