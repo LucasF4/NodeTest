@@ -36,10 +36,10 @@ router.get('/login', (req, res) => {
     res.render("users/login", {erro: erro})
 })
 
-router.get('/upload', (req, res) => {
-    var user = req.session.resultado.id
+router.get('/upload', auth, (req, res) => {
+    var user = req.session.resultado
     if(user != undefined){
-        Users.findByPk(user).then(resultado => {
+        Users.findByPk(user.id).then(resultado => {
             res.render("parciais/upload.ejs", {foto: resultado.foto})
         })
     }else{
@@ -63,13 +63,14 @@ router.post('/upload', upload.single('img'), async (req, res) => {
             if(client != undefined){
                 var teste = client.foto
                 console.log(teste)
-                if(teste === 'assets/noprofile.jpg'){
+                if(teste == 'assets/noprofile.jpg'){
                     Users.update({foto: img}, {where:{nome: usuario.nome}}).then(function(rowsUpdated){
                         res.redirect('/upload')
                     }).catch(e => {
                         console.log(e)
                     })
                 }else{
+                    console.log(teste)
                     var x = await fs.unlinkSync(`public/${client.foto}`)
                     console.log(x);
                     Users.update({foto: img}, {where:{nome: usuario.nome}}).then(function(rowsUpdated){
@@ -88,7 +89,7 @@ router.post('/upload', upload.single('img'), async (req, res) => {
 })
 
 
-router.post('/cadastro', upload.single('foto'), async (req, res)=>{
+router.post('/user/cadastro', upload.single('foto'), async (req, res)=>{
     var {nome,email,password} = req.body
     var foto = req.file
 
@@ -111,25 +112,25 @@ router.post('/cadastro', upload.single('foto'), async (req, res)=>{
                     senha: hash,
                     foto: foto
                 }).then(dado=>{
-                    res.send(dado)
+                    res.redirect('/login')
                 }).catch(err => {
                     var erro = `Erro ao cadastrar o usuário \n${err}`
                     req.flash("erro", erro)
-                    res.redirect("/cadastro") 
+                    res.redirect("/user/cadastro") 
                 })
         }else{
             var erro = `Erro ao cadastrar Usuário \nUsuário já cadastrado`
             req.flash("erro", erro)
-            res.redirect("/cadastro")
+            res.redirect("/user/cadastro")
         }
     })
     
 })
 
-router.get('/authentic', (req, res) => {
-    var user = req.session.resultado.id
+router.get('/authentic', auth, (req, res) => {
+    var user = req.session.resultado
     if(user != undefined){
-        Users.findByPk(user).then(resultado => {
+        Users.findByPk(user.id).then(resultado => {
             res.render('users/authentic', {nome: resultado.nome, foto: resultado.foto})
         })
     }else{
@@ -167,7 +168,9 @@ router.post('/logar', (req, res)=>{
 
 router.get("/logout", (req, res) => {
     req.session.resultado = undefined;
-    res.redirect('/')
+    var erro = 'Sessão Encerrada'
+    req.flash('erroLogin', erro)
+    res.redirect('/login')
 })
 
 module.exports = router;

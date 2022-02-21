@@ -8,7 +8,7 @@
         <h1>Upload de Imagem</h1>
         <form enctype="multipart/form-data" action="/upload" method="post" class="mb-3">
             <label for="formFile" class="form-label">Insert the photo you want as a profile</label>
-            <input class="form-control" type="file" name="img" id="formFile">
+            <input class="form-control" type="file" name="img" id="formFile" accept=".png, .jpg, .jfif">
             <button class="btn btn-primary bottom mt-4" type="submit">Send picture</button>
             <a href="/authentic" class="btn btn-danger mt-4" type="button">Voltar</a>
         </form>

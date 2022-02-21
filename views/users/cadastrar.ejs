@@ -2,12 +2,19 @@
 <%- include("../parciais/nav.ejs") %>
 
 <body>
-    <div class="card position-absolute top-50 start-50 translate-middle" style="width: 25rem;">
+
+    <% if(erro){ %>
+        <div class="alert alert-danger" role="alert">
+            <%= erro %>
+        </div>
+    <% } %>
+
+    <div class="card position-absolute top-50 start-50 translate-middle mt-5" style="width: 25rem;">
         <div class="card-body">
-            <form class="container mt-4" action="/cadastro" method="POST" enctype="multipart/form-data" novalidate>
+            <form class="container mt-4 needs-validation" action="/user/cadastro" method="POST" enctype="multipart/form-data" novalidate>
                 <div class="personal-image">
                     <label class="label">
-                        <input type="file" name="foto" id="fileFoto" />
+                        <input type="file" name="foto" id="fileFoto" accept=".png, .jpg, .jfif"/>
                         <figure class="personal-figure">
                             <img src="/assets/noprofile.jpg" id="foto" class="personal-avatar" alt="avatar">
                             <figcaption class="personal-figcaption">
@@ -20,17 +27,82 @@
                 <div class="mb-3">
                     <label for="name" class="form-label">Nome de Usuário</label>
                     <input type="text" class="form-control" id="nome" name="nome" aria-describedby="nametest" required/>
+                    <div class="valid-feedback">Look Good!</div><div class="invalid-feedback">Something went wrong!</div>
                 </div>
                 <div class="mb-3">
                     <label for="email" class="form-label">Endereço de Email</label>
                     <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" required/>
+                    <div class="valid-feedback">Look Good!</div><div class="invalid-feedback">Something went wrong!</div>
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
                     <input type="password" class="form-control" id="password" name="password" required/>
+                    <div class="valid-feedback">Look Good!</div><div class="invalid-feedback">Something went wrong!</div>
                 </div>
-                <div class="row"><button id="btnCad" type="submit" class="col-6 mx-auto btn btn-primary" style="width: 50%;" onclick="cad()">Submit</button></div>
+                <div class="mb-3">
+                    <label for="confirmpass" class="form-label">Confirm to Password</label>
+                    <input type="password" class="form-control" id="confirmPass" name="confirmPass" required />
+                    <div class="valid-feedback">Look Good!</div><div class="invalid-feedback">Something went wrong!</div>
+                </div>
+                <div class="row"><button id="btnCad" type="submit" class="col-6 mx-auto btn btn-primary" style="width: 50%;">Submit</button></div>
             </form>
         </div>
     </div>
 </body>
+
+<script>
+
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function () {
+    'use strict'
+
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.querySelectorAll('.needs-validation')
+
+    // Loop over them and prevent submission
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+            }
+
+            form.classList.add('was-validated')
+        }, false)
+        })
+    })()
+
+    //Função que adiciona uma preview da imagem no cadastro
+
+    function readImage(){
+        if(this.files && this.files){
+            var file = new FileReader();
+
+            console.log(file)
+
+            file.onload = function (e) {
+                document.getElementById("foto").src = e.target.result;
+            }
+            file.readAsDataURL(this.files[0])
+        }
+    }
+
+    document.getElementById("fileFoto").addEventListener("change", readImage, false)
+
+
+    var password = document.getElementById('password')
+    var confirmPass = document.getElementById('confirmPass')
+
+    function validatePass(){
+        if(password.value != confirmPass.value){
+            confirmPass.setCustomValidity("Senhas diferentes!");
+        }else{
+            confirmPass.setCustomValidity("");
+        }
+    }
+
+    password.onchange = validatePass;
+    confirmPass.onkeyup = validatePass;
+
+</script>
