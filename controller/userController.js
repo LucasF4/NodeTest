@@ -162,6 +162,8 @@ router.post('/logar', (req, res)=>{
             }
         })
     }else{
+        var erro = `Os campos devem estar preenchidos`
+        req.flash("erroLogin", erro)
         res.redirect('/login')
     }
 })
